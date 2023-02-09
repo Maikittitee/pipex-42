@@ -1,19 +1,22 @@
 
-MAIN = main.c
-EXEC = main
+SRCS = pipex.c
+EXEC = pipex
 LIBS_FLAG = -lft -lftprintf  
 FLAG = -Wall -Werror -Wextra
 
-all : compile
+all : run
+
+compilef:
+	gcc ${LIBS_FLAG} -L./libs -g ${LIBS_FLAG} ${SRCS} -o pipex
 
 compile:
-	gcc ${FLAG} -L./libs ${MAIN} ${LIBS_FLAG} -o main
+	gcc -L./libs -g ${SRCS} ${LIBS_FLAG} -o pipex
 
-run: compile
-	./main
+run: compilef
+	./${EXEC} "file1.txt" "cat" "wc -l" "file2.txt" 
 
 clean :
-	rm main
+	rm pipex
 fclean :
 
 re : clean
