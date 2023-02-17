@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/17 13:22:18 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/17 13:40:49 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,8 @@ int	main(int ac, char **av, char **env)
 		ft_displayerr(FORK_ERR, NULL, errno);
 	if (id == 0)
 	{
+		if (pipe(fd) != 0)
+			ft_displayerr(PIPE_ERR, NULL , errno);
 		id_in_child = fork();
 		if (id_in_child == -1)
 			ft_displayerr(FORK_ERR, NULL, errno);
@@ -147,13 +149,10 @@ int	main(int ac, char **av, char **env)
 		else
 		{
 			wait(NULL);
-			//usleep(1000000);
 			ft_child2_process(path, av, env, fd);	
 		}
 	}
 	wait(NULL);
-	//usleep(1000000);
-	ft_putstr_fd("Execute Done c1,c2",2);
-	//ft_parent_process(path, av, env, fd);
+//	ft_putstr_fd("Execute Done c1,c2",2);
 	return (0);
 }
