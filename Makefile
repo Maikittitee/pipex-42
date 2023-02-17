@@ -13,7 +13,7 @@ compile:
 	gcc -L./libs -g ${SRCS} ${LIBS_FLAG} -o pipex
 
 run: compilef
-	./${EXEC} "file1.txt" "cat" "wc -l" "file2.txt" 
+	./${EXEC} "file1.txt" "cat" "grep line" "file2.txt" 
 
 clean :
 	rm pipex

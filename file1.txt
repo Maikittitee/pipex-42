@@ -1,3 +1,5 @@
 this is file1 ur fucking idiot
 this is line1
 this is line2
+this is no l!ne
+line1 line2 line4
