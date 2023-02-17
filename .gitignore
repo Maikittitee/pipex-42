@@ -21,7 +21,6 @@ a.out
 
 # Libraries
 *.lib
-*.a
 *.la
 *.lo
 
