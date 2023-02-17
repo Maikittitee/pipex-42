@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/17 13:40:49 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/17 20:15:33 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ char 	**join_bs(char **path)
 	i = 0;
 	while (path[i])
 	{
-		path[i] = ft_strjoin(path[i], "/"); //Leak
+		path[i] = ft_strjoin_free(path[i], "/"); //Leak
 		i++;
 	}
 	return (path);
@@ -76,10 +76,10 @@ void	execute(char **path, char **av, char **env, int indexofcmd)
 	{
 		while (path[i])
 		{
-			path[i] = ft_strjoin(path[i], cmd[0]); //leak
+			path[i] = ft_strjoin_free(path[i], cmd[0]); //leak
 			if (access(path[i], F_OK) == 0) 
 			{
-				cmd[0] = ft_strjoin(path[i], ""); //leak
+				cmd[0] = ft_strjoin_free(path[i], ""); //leak
 				execve(cmd[0], cmd, env);	
 			}
 			i++;
@@ -104,7 +104,7 @@ void	ft_child1_process(char **path, char **av, char **env, int fd[2])
 	execute(path, av, env, 2);
 }
 
-void	ft_child2_process (char **path, char **av, char **env, int fd[2])
+void	ft_child2_process(char **path, char **av, char **env, int fd[2])
 {
 	int	outfile_fd;
 
@@ -126,6 +126,7 @@ int	main(int ac, char **av, char **env)
 	int		id;
 	int 	id_in_child;
 	int		fd[2];
+	int		pid;
 
 	if (ac != 5)
 	{
@@ -134,25 +135,22 @@ int	main(int ac, char **av, char **env)
 	}
 	path = ft_split(env[get_path_index(env)] + 5, ':');
 	path = join_bs(path);
+	if (pipe(fd) != 0)
+			ft_displayerr(PIPE_ERR, NULL , errno);
 	id = fork();
 	if (id == -1)
 		ft_displayerr(FORK_ERR, NULL, errno);
 	if (id == 0)
 	{
-		if (pipe(fd) != 0)
-			ft_displayerr(PIPE_ERR, NULL , errno);
-		id_in_child = fork();
-		if (id_in_child == -1)
-			ft_displayerr(FORK_ERR, NULL, errno);
-		if (id_in_child == 0)
-			ft_child1_process(path, av, env, fd);
-		else
-		{
-			wait(NULL);
-			ft_child2_process(path, av, env, fd);	
-		}
+		pid = getpid();
+		ft_child1_process(path, av, env, fd);
 	}
-	wait(NULL);
-//	ft_putstr_fd("Execute Done c1,c2",2);
+	else
+	{
+		waitpid(pid,NULL,0);
+		//wait(NULL);
+		ft_child2_process(path, av, env, fd);	
+	}
+	//waitpid(pid[0],NULL,0);
 	return (0);
 }
