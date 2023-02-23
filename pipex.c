@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/23 18:41:08 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/23 22:53:34 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,13 @@ void	ft_double_free(char **s)
 	free(s);
 }
 
+void	ft_free_pipex(t_pipex *pipex)
+{
+		ft_double_free(pipex->cmd1);
+		ft_double_free(pipex->cmd2);
+		ft_double_free(pipex->path);
+}
+
 void	ft_find_cmd(t_pipex *pipex, char **av)
 {
 	int	cmd1_access_flag;
@@ -58,6 +65,7 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 	int	i;
 	char	*pure_cmd1;
 	char	*pure_cmd2;
+	char	curr;
 	
 
 	cmd1_access_flag = 0;
@@ -83,6 +91,8 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 		{	
 			cmd1_access_flag = 1; 	
 		}
+		if ((pipex->cmd1)[0])
+			free((pipex->cmd1)[0]);
 		i++;
 	}
 	i = 0;
@@ -105,34 +115,6 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 		free(pure_cmd2);
 
 
-}
-
-
-int	get_path_index(char **env)
-{
-	int	i;
-
-	i = 0;
-	while (env[i])
-	{
-		if (ft_strnstr(env[i], "PATH", 5))
-			return (i);
-		i++;
-	}
-	return (0);
-}
-
-char	**join_bs(char **path)
-{
-	int	i;
-
-	i = 0;
-	while ((path)[i])
-	{
-		(path)[i] = ft_strjoin_free((path)[i], "/"); 
-		i++;
-	}
-	return (path);
 }
 
 void	ft_child1_process(t_pipex pipex, char **av, char **env, int fd[2])
@@ -184,8 +166,7 @@ int	main(int ac, char **av, char **env)
 		ft_putstr_fd("This program take 4 argument", 2);
 		exit(1);
 	}
-	pipex.path = ft_split(env[get_path_index(env)] + 5, ':');
-	pipex.path = join_bs(pipex.path);
+	pipex.path = get_path(env);
 	ft_find_cmd(&pipex, av);
 	if (pipe(fd) != 0)
 	 		ft_displayerr(PIPE_ERR, NULL , errno);
@@ -206,11 +187,14 @@ int	main(int ac, char **av, char **env)
 	}
 	close(fd[0]);
 	close(fd[1]);	
-	waitpid(pipex.pid1,&status,0);
+	waitpid(pipex.pid1,NULL,0);
 	waitpid(pipex.pid2, &status ,0);
 	ft_double_free(pipex.path);
 	ft_double_free(pipex.cmd1);
 	ft_double_free(pipex.cmd2);
+	ft_printf("Path after free is %s\n",pipex.path);
+	ft_printf("cmd1 after free is %s\n",pipex.cmd1);
+	ft_printf("cmd2 after free is %s\n",pipex.cmd2);
 	return (WEXITSTATUS(status));
 	
 }

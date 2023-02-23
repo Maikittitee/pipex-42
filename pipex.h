@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 19:22:43 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/23 13:08:25 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/23 20:58:05 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 
 char *ft_strjoin_free(char *s1, char *s2);
 char *ft_strjoin_free_back(char *s1, char *s2);
+char **get_path(char **env);
 
 # define ARG_ERR 1
 # define FORK_ERR 2
