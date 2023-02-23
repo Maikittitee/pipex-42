@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/23 18:31:15 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/23 18:41:08 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,16 +122,17 @@ int	get_path_index(char **env)
 	return (0);
 }
 
-void	join_bs(t_pipex *pipex)
+char	**join_bs(char **path)
 {
 	int	i;
 
 	i = 0;
-	while ((pipex->path)[i])
+	while ((path)[i])
 	{
-		(pipex->path)[i] = ft_strjoin_free((pipex->path)[i], "/"); //Leak
+		(path)[i] = ft_strjoin_free((path)[i], "/"); 
 		i++;
 	}
+	return (path);
 }
 
 void	ft_child1_process(t_pipex pipex, char **av, char **env, int fd[2])
@@ -183,8 +184,8 @@ int	main(int ac, char **av, char **env)
 		ft_putstr_fd("This program take 4 argument", 2);
 		exit(1);
 	}
-	pipex.path = ft_split(env[get_path_index(env) + 5], ':');
-	join_bs(&pipex);
+	pipex.path = ft_split(env[get_path_index(env)] + 5, ':');
+	pipex.path = join_bs(pipex.path);
 	ft_find_cmd(&pipex, av);
 	if (pipe(fd) != 0)
 	 		ft_displayerr(PIPE_ERR, NULL , errno);
