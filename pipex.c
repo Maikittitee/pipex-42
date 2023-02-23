@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/24 00:38:05 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/24 00:41:17 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 	pipex->cmd2 = ft_split(av[3],' ');
 	pure_cmd1 = ft_strdup((pipex->cmd1)[0]);
 	pure_cmd2 = ft_strdup((pipex->cmd2)[0]);
-	
+	temp = (pipex->cmd1)[0];
 	if (access((pipex->cmd1)[0], F_OK) == 0)
 	{
 		cmd1_access_flag = 1; 
@@ -86,9 +86,9 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 	}
 	while (!cmd1_access_flag && (pipex->path)[i])
 	{
+		(pipex->cmd1)[0] = ft_strjoin((pipex->path)[i],pure_cmd1);
 		if (temp)
 			free(temp);
-		(pipex->cmd1)[0] = ft_strjoin((pipex->path)[i],pure_cmd1);
 		temp = (pipex->cmd1)[0];
 		if (access((pipex->cmd1)[0], F_OK) == 0) 
 		{	
@@ -98,11 +98,12 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 	}
 	i = 0;
 	temp = NULL;
+	//temp = (pipex->cmd2)[0];
 	while (!cmd2_access_flag && (pipex->path)[i])
 	{
+		(pipex->cmd2)[0] = ft_strjoin((pipex->path)[i], pure_cmd2);
 		if (temp)
 			free(temp);
-		(pipex->cmd2)[0] = ft_strjoin((pipex->path)[i], pure_cmd2);
 		temp = (pipex->cmd2)[0];
 		if (access((pipex->cmd2)[0], F_OK) == 0) 
 		{	
