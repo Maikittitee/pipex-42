@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maikittitee <maikittitee@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/17 20:15:33 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/23 12:12:32 by maikittitee      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,19 @@
 
 //fd[0] is for read from the pipe
 //fd[1] is for write to the  pipe
+
+void	ft_double_free(char **s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		free(s[i]);
+		i++;
+	}
+	free(s);
+}
 
 void	ft_displayerr(int err, char *msg, int errnum)
 {
@@ -76,10 +89,10 @@ void	execute(char **path, char **av, char **env, int indexofcmd)
 	{
 		while (path[i])
 		{
-			path[i] = ft_strjoin_free(path[i], cmd[0]); //leak
+			path[i] = ft_strjoin_free(path[i], cmd[0]);
 			if (access(path[i], F_OK) == 0) 
 			{
-				cmd[0] = ft_strjoin_free(path[i], ""); //leak
+				cmd[0] = ft_strjoin(path[i], ""); //should be leak
 				execve(cmd[0], cmd, env);	
 			}
 			i++;
@@ -95,7 +108,7 @@ void	ft_child1_process(char **path, char **av, char **env, int fd[2])
 
 	infile_fd = open(av[1], O_RDONLY);
 	if (infile_fd < 0)
-		ft_displayerr(FILE_ERR, av[1], errno);
+		ft_displayerr(FILE_ERR, av[1], EXIT_FAILURE);
 	dup2(infile_fd, STDIN_FILENO);
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
@@ -110,7 +123,7 @@ void	ft_child2_process(char **path, char **av, char **env, int fd[2])
 
 	outfile_fd = open(av[4], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	if (outfile_fd < 0)
-		ft_displayerr(FILE_ERR, av[4], errno);
+		ft_displayerr(FILE_ERR, av[4], EXIT_FAILURE);
 	dup2(fd[0], STDIN_FILENO);
 	dup2(outfile_fd, STDOUT_FILENO);
 	close(fd[0]);
@@ -122,35 +135,40 @@ void	ft_child2_process(char **path, char **av, char **env, int fd[2])
 
 int	main(int ac, char **av, char **env)
 {
-	char	**path;
-	int		id;
-	int 	id_in_child;
 	int		fd[2];
-	int		pid;
+	t_pipex pipex;
+	int	status;
+	
 
 	if (ac != 5)
 	{
 		ft_putstr_fd("This program take 4 argument", 2);
 		exit(1);
 	}
-	path = ft_split(env[get_path_index(env)] + 5, ':');
-	path = join_bs(path);
+	pipex.path = ft_split(env[get_path_index(env)] + 5, ':');
+	pipex.path = join_bs(pipex.path);
 	if (pipe(fd) != 0)
-			ft_displayerr(PIPE_ERR, NULL , errno);
-	id = fork();
-	if (id == -1)
+	 		ft_displayerr(PIPE_ERR, NULL , errno);
+	pipex.pid1 = fork();
+	if (pipex.pid1 == -1)
+	{
+		ft_double_free(pipex.path);
 		ft_displayerr(FORK_ERR, NULL, errno);
-	if (id == 0)
-	{
-		pid = getpid();
-		ft_child1_process(path, av, env, fd);
 	}
-	else
+	if (pipex.pid1 == 0)
 	{
-		waitpid(pid,NULL,0);
-		//wait(NULL);
-		ft_child2_process(path, av, env, fd);	
+		ft_child1_process(pipex.path, av, env, fd);
 	}
-	//waitpid(pid[0],NULL,0);
-	return (0);
+	pipex.pid2 = fork();
+	if (pipex.pid2 == 0 && status == 0)
+	{
+		ft_child2_process(pipex.path, av, env, fd);
+	}
+	close(fd[0]);
+	close(fd[1]);	
+	waitpid(pipex.pid1,NULL,0);
+	waitpid(pipex.pid2, &status ,0);
+	ft_double_free(pipex.path);
+	return (WEXITSTATUS(status));
+	
 }
