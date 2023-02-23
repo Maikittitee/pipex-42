@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/24 00:41:17 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/24 00:41:55 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,7 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 		i++;
 	}
 	i = 0;
-	temp = NULL;
-	//temp = (pipex->cmd2)[0];
+	temp = (pipex->cmd2)[0];
 	while (!cmd2_access_flag && (pipex->path)[i])
 	{
 		(pipex->cmd2)[0] = ft_strjoin((pipex->path)[i], pure_cmd2);
