@@ -6,17 +6,18 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/24 00:41:55 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/24 11:35:46 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include "pipex.h"
 
 //EXE		./pipex infile cmd1 cmd2 outfile
 //ARG		   0	  1		2	 3		4
 
 //fd[0] is for read from the pipe
 //fd[1] is for write to the  pipe
+
+
+#include "pipex.h"
 
 void	ft_displayerr(int err, char *msg, int errnum)
 {
@@ -197,9 +198,6 @@ int	main(int ac, char **av, char **env)
 	ft_double_free(pipex.path);
 	ft_double_free(pipex.cmd1);
 	ft_double_free(pipex.cmd2);
-	ft_printf("Path after free is %s\n",pipex.path);
-	ft_printf("cmd1 after free is %s\n",pipex.cmd1);
-	ft_printf("cmd2 after free is %s\n",pipex.cmd2);
 	return (WEXITSTATUS(status));
 	
 }
