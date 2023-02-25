@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maikittitee <maikittitee@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/24 11:35:46 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/25 20:32:53 by maikittitee      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,16 +61,14 @@ void	ft_free_pipex(t_pipex *pipex)
 
 void	ft_find_cmd(t_pipex *pipex, char **av)
 {
-	int	cmd1_access_flag;
-	int	cmd2_access_flag;
 	int	i;
 	char	*pure_cmd1;
 	char	*pure_cmd2;
 	char	*temp;
 	
 	temp = NULL;
-	cmd1_access_flag = 0;
-	cmd2_access_flag = 0;
+	pipex->access_flag1 = 0;
+	pipex->access_flag2 = 0;
 	i = 0;
 	pipex->cmd1 = ft_split(av[2],' ');
 	pipex->cmd2 = ft_split(av[3],' ');
@@ -79,13 +77,13 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 	temp = (pipex->cmd1)[0];
 	if (access((pipex->cmd1)[0], F_OK) == 0)
 	{
-		cmd1_access_flag = 1; 
+		pipex->access_flag1 = 1; 
 	}
 	if (access((pipex->cmd2)[0], F_OK) == 0)
 	{
-		cmd2_access_flag = 1; 
+		pipex->access_flag2 = 1; 
 	}
-	while (!cmd1_access_flag && (pipex->path)[i])
+	while (!pipex->access_flag1 && (pipex->path)[i])
 	{
 		(pipex->cmd1)[0] = ft_strjoin((pipex->path)[i],pure_cmd1);
 		if (temp)
@@ -93,13 +91,13 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 		temp = (pipex->cmd1)[0];
 		if (access((pipex->cmd1)[0], F_OK) == 0) 
 		{	
-			cmd1_access_flag = 1; 	
+			pipex->access_flag1 = 1; 
 		}
 		i++;
 	}
 	i = 0;
 	temp = (pipex->cmd2)[0];
-	while (!cmd2_access_flag && (pipex->path)[i])
+	while (!pipex->access_flag2 && (pipex->path)[i])
 	{
 		(pipex->cmd2)[0] = ft_strjoin((pipex->path)[i], pure_cmd2);
 		if (temp)
@@ -107,14 +105,10 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 		temp = (pipex->cmd2)[0];
 		if (access((pipex->cmd2)[0], F_OK) == 0) 
 		{	
-			cmd2_access_flag = 1; 	
+			pipex->access_flag2 = 1; 
 		}
 		i++;
 	}
-	if (!cmd1_access_flag)
-		ft_displayerr(CMD_ERR, av[2], 127);
-	if (!cmd2_access_flag)
-		ft_displayerr(CMD_ERR, av[3], 127);
 	if (pure_cmd1)
 		free(pure_cmd1);
 	if (pure_cmd2)
@@ -133,6 +127,9 @@ void	ft_child1_process(t_pipex pipex, char **av, char **env, int fd[2])
 		ft_double_free(pipex.path);
 		ft_displayerr(FILE_ERR, av[1], EXIT_FAILURE);
 	}
+	if (!pipex.access_flag1)
+		ft_displayerr(CMD_ERR, av[3], 127);
+		
 	dup2(infile_fd, STDIN_FILENO);
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
@@ -151,11 +148,14 @@ void	ft_child2_process(t_pipex pipex, char **av, char **env, int fd[2])
 		ft_double_free(pipex.path);
 		ft_displayerr(FILE_ERR, av[4], EXIT_FAILURE);
 	}
+	if (!pipex.access_flag2)
+		ft_displayerr(CMD_ERR, av[3], 127);
 	dup2(fd[0], STDIN_FILENO);
 	dup2(outfile_fd, STDOUT_FILENO);
 	close(fd[0]);
 	close(fd[1]);
 	close(outfile_fd);
+	(void)env;
 	execve((pipex.cmd2)[0], pipex.cmd2, env);
 }
 
@@ -167,6 +167,8 @@ int	main(int ac, char **av, char **env)
 	int	status;
 	
 
+	pipex.cmd1 = NULL;
+	pipex.cmd2 = NULL;
 	if (ac != 5)
 	{
 		ft_putstr_fd("This program take 4 argument", 2);
@@ -198,6 +200,9 @@ int	main(int ac, char **av, char **env)
 	ft_double_free(pipex.path);
 	ft_double_free(pipex.cmd1);
 	ft_double_free(pipex.cmd2);
-	return (WEXITSTATUS(status));
+	//ft_printf("Status is %d \n", status);
+	//ft_printf("WEXITStatus is %d \n", WEXITSTATUS(status));
+
+	return (status >> 8);
 	
 }

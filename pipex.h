@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maikittitee <maikittitee@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 19:22:43 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/23 20:58:05 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/25 20:28:41 by maikittitee      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,11 @@ char **get_path(char **env);
 typedef struct s_pipex{
     int pid1;
     int pid2;
+	int access_flag1;
+	int	access_flag2;
     char **cmd1;
     char **cmd2;
+
     char **path;
 } t_pipex;
 
