@@ -6,7 +6,7 @@
 /*   By: maikittitee <maikittitee@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/27 10:31:00 by maikittitee      ###   ########.fr       */
+/*   Updated: 2023/02/27 11:15:00 by maikittitee      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 #include "pipex.h"
 
-void	ft_displayerr(int err, char *msg, int errnum)
+void	ft_displayerr(int err, char *msg, int errnum, t_pipex *pipex)
 {
 	if (err == ARG_ERR)
 		ft_putstr_fd("Invalid number of argument.\n", 2);
@@ -36,6 +36,8 @@ void	ft_displayerr(int err, char *msg, int errnum)
 		ft_putstr_fd(msg, STDERR_FILENO);
 		free(msg);
 	}
+	if (pipex)
+		ft_free_pipex(pipex);
 	exit (errnum);
 }
 
@@ -54,8 +56,11 @@ void	ft_double_free(char **s)
 
 void	ft_free_pipex(t_pipex *pipex)
 {
+	if (pipex->cmd1)
 		ft_double_free(pipex->cmd1);
+	if (pipex->cmd2)
 		ft_double_free(pipex->cmd2);
+	if (pipex->path)
 		ft_double_free(pipex->path);
 }
 
@@ -138,45 +143,39 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 
 }
 
-void	ft_child1_process(t_pipex pipex, char **av, char **env, int fd[2])
+void	ft_child1_process(t_pipex *pipex, char **av, char **env, int fd[2])
 {
 	int	infile_fd;
 
 	infile_fd = open(av[1], O_RDONLY);
 	if (infile_fd < 0)
-	{
-		ft_double_free(pipex.path);
-		ft_displayerr(FILE_ERR, av[1], EXIT_FAILURE);
-	}
-	if (!pipex.access_flag1)
-		ft_displayerr(CMD_ERR, av[3], 127);
+		ft_displayerr(FILE_ERR, av[1], EXIT_FAILURE, pipex);
+	if (!pipex->access_flag1)
+		ft_displayerr(CMD_ERR, av[3], 127, pipex);
 		
 	dup2(infile_fd, STDIN_FILENO);
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
 	close(fd[0]);
 	close(infile_fd);
-	execve((pipex.cmd1)[0], pipex.cmd1, env);
+	execve((pipex->cmd1)[0], pipex->cmd1, env);
 }
 
-void	ft_child2_process(t_pipex pipex, char **av, char **env, int fd[2])
+void	ft_child2_process(t_pipex *pipex, char **av, char **env, int fd[2])
 {
 	int	outfile_fd;
 
 	outfile_fd = open(av[4], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	if (outfile_fd < 0)
-	{	
-		ft_double_free(pipex.path);
-		ft_displayerr(FILE_ERR, av[4], EXIT_FAILURE);
-	}
-	if (!pipex.access_flag2)
-		ft_displayerr(CMD_ERR, av[3], 127);
+		ft_displayerr(FILE_ERR, av[4], EXIT_FAILURE, pipex);
+	if (!pipex->access_flag2)
+		ft_displayerr(CMD_ERR, av[3], 127, pipex);
 	dup2(fd[0], STDIN_FILENO);
 	dup2(outfile_fd, STDOUT_FILENO);
 	close(fd[0]);
 	close(fd[1]);
 	close(outfile_fd);
-	execve((pipex.cmd2)[0], pipex.cmd2, env);
+	execve((pipex->cmd2)[0], pipex->cmd2, env);
 }
 
 
@@ -186,37 +185,30 @@ int	main(int ac, char **av, char **env)
 	t_pipex pipex;
 	int	status;
 	
-
 	pipex.cmd1 = NULL;
 	pipex.cmd2 = NULL;
+	pipex.path = NULL;
 	if (ac != 5)
-	{
-		ft_putstr_fd("This program take 4 argument", 2);
-		exit(1);
-	}
+		ft_displayerr(ARG_ERR, NULL, 1, &pipex);
 	pipex.path = get_path(env);
 	ft_find_cmd(&pipex, av);
 	if (pipe(fd) != 0)
-	 		ft_displayerr(PIPE_ERR, NULL , errno);
+		ft_displayerr(PIPE_ERR, NULL , errno, &pipex);
 	pipex.pid1 = fork();
 	if (pipex.pid1 == -1)
-	{
-		ft_double_free(pipex.path);
-		ft_displayerr(FORK_ERR, NULL, errno);
-	}
+		ft_displayerr(FORK_ERR, NULL, errno, &pipex);
 	if (pipex.pid1 == 0)
-		ft_child1_process(pipex, av, env, fd);
+		ft_child1_process(&pipex, av, env, fd);
 	pipex.pid2 = fork();
+	if (pipex.pid2 == -1)
+		ft_displayerr(FORK_ERR, NULL, errno, &pipex);
 	if (pipex.pid2 == 0)
-		ft_child2_process(pipex, av, env, fd);
+		ft_child2_process(&pipex, av, env, fd);
 	close(fd[0]);
 	close(fd[1]);	
 	waitpid(pipex.pid1,NULL,0);
 	waitpid(pipex.pid2, &status ,0);
-	ft_double_free(pipex.path);
-	ft_double_free(pipex.cmd1);
-	ft_double_free(pipex.cmd2);
-
+	ft_free_pipex(&pipex);
 	return (status >> 8);
 	
 }
