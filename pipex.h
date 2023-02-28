@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 19:22:43 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/28 14:54:31 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/28 14:58:43 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,4 @@ void	*ft_memset(void *b, int c, size_t len);
 # define FILE_ERR 4
 # define CMD_ERR 5
 
-
 #endif
-
