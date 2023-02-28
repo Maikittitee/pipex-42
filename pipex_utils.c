@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 19:13:56 by ktunchar          #+#    #+#             */
-/*   Updated: 2023/02/28 15:09:37 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/28 15:23:03 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ char	**get_path(char **env)
 	return (ret_path);
 }
 
-
 int	is_access_cmd(char **path, char **cmd, char *pure_cmd)
 {
 	char	*temp;
@@ -68,8 +67,6 @@ void	ft_find_cmd(t_pipex *pipex, char **av)
 {
 	static char	*p_cmd[2];
 
-	//p_cmd[0] = NULL;
-	//p_cmd[1] = NULL;
 	if (av[2][0] != 0)
 	{
 		pipex->cmd1 = ft_split(av[2], ' ');

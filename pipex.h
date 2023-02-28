@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 19:22:43 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/28 14:58:43 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/28 15:20:37 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 # include <fcntl.h>
 # include <sys/errno.h>
 # include <stdlib.h>
-
 
 typedef struct s_pipex{
 	int		pid1;
