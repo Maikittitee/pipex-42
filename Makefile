@@ -1,5 +1,5 @@
 
-SRCS = pipex.c pipex_utils.c
+SRCS = pipex.c pipex_utils.c pipex_free_utils.c
 EXEC = pipex
 LIBS_FLAG = -lft -lftprintf  
 FLAG = -Wall -Werror -Wextra

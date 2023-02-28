@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maikittitee <maikittitee@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ktunchar <ktunchar@42bangkok.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 19:22:43 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/27 11:08:59 by maikittitee      ###   ########.fr       */
+/*   Updated: 2023/02/27 11:20:18 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ typedef struct s_pipex{
 } t_pipex;
 
 char *ft_strjoin_free(char *s1, char *s2);
-char *ft_strjoin_free_back(char *s1, char *s2);
 char **get_path(char **env);
 void	ft_displayerr(int err, char *msg, int errnum, t_pipex *pipex);
 void	ft_double_free(char **s);
