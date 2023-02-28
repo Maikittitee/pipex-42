@@ -6,16 +6,14 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 15:28:05 by maikittitee       #+#    #+#             */
-/*   Updated: 2023/02/27 14:00:58 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/28 14:23:17 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //EXE		./pipex infile cmd1 cmd2 outfile
 //ARG		   0	  1		2	 3		4
-
 //fd[0] is for read from the pipe
 //fd[1] is for write to the  pipe
-
 
 #include "pipex.h"
 
@@ -41,7 +39,6 @@ void	ft_displayerr(int err, char *msg, int errnum, t_pipex *pipex)
 	exit (errnum);
 }
 
-
 void	ft_child1_process(t_pipex *pipex, char **av, char **env, int fd[2])
 {
 	int	infile_fd;
@@ -51,7 +48,6 @@ void	ft_child1_process(t_pipex *pipex, char **av, char **env, int fd[2])
 		ft_displayerr(FILE_ERR, av[1], EXIT_FAILURE, pipex);
 	if (!pipex->access_flag1)
 		ft_displayerr(CMD_ERR, av[3], 127, pipex);
-		
 	dup2(infile_fd, STDIN_FILENO);
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[1]);
@@ -64,7 +60,7 @@ void	ft_child1_process(t_pipex *pipex, char **av, char **env, int fd[2])
 void	ft_child2_process(t_pipex *pipex, char **av, char **env, int fd[2])
 {
 	int	outfile_fd;
-	
+
 	outfile_fd = open(av[4], O_RDWR | O_CREAT | O_TRUNC, 0777);
 	if (outfile_fd < 0)
 		ft_displayerr(FILE_ERR, av[4], EXIT_FAILURE, pipex);
@@ -79,23 +75,17 @@ void	ft_child2_process(t_pipex *pipex, char **av, char **env, int fd[2])
 		exit(errno);
 }
 
-
 int	main(int ac, char **av, char **env)
 {
 	int		fd[2];
-	t_pipex pipex;
-	int	status;
-	(void)ac;
-	
-	pipex.cmd1 = NULL;
-	pipex.cmd2 = NULL;
-	pipex.path = NULL;
+	t_pipex	pipex;
+
+	init_pipex(&pipex, env);
 	if (ac != 5)
 		ft_displayerr(ARG_ERR, NULL, 1, &pipex);
-	pipex.path = get_path(env);
 	ft_find_cmd(&pipex, av);
 	if (pipe(fd) != 0)
-		ft_displayerr(PIPE_ERR, NULL , errno, &pipex);
+		ft_displayerr(PIPE_ERR, NULL, errno, &pipex);
 	pipex.pid1 = fork();
 	if (pipex.pid1 == -1)
 		ft_displayerr(FORK_ERR, NULL, errno, &pipex);
@@ -107,10 +97,9 @@ int	main(int ac, char **av, char **env)
 	if (pipex.pid2 == 0)
 		ft_child2_process(&pipex, av, env, fd);
 	close(fd[0]);
-	close(fd[1]);	
-	waitpid(pipex.pid1,NULL,0);
-	waitpid(pipex.pid2, &status ,0);
+	close(fd[1]);
+	waitpid(pipex.pid1, NULL, 0);
+	waitpid(pipex.pid2, &(pipex.status), 0);
 	ft_free_pipex(&pipex);
-	return (status >> 8);
-	
+	return (WEXITSTATUS(pipex.status));
 }

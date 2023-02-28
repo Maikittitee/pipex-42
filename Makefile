@@ -1,28 +1,27 @@
+NAME = pipex
 
-SRCS = pipex.c pipex_utils.c pipex_free_utils.c
-EXEC = pipex
-LIBS_FLAG = -lft -lftprintf  
-FLAG = -Wall -Werror -Wextra
+CC = gcc
 
-all : run
+FLAGS = -Wall -Werror -Wextra
 
-compilef:
-	gcc ${FLAG} -L./libs -g  ${LIBS_FLAG}${SRCS} -o pipex
+SRCS = pipex.c pipex_free_utils.c pipex_utils.c ft_putstr_fd.c ft_split.c ft_strdup.c ft_strjoin.c ft_strnstr.c ft_strtrim.c ft_bzero.c ft_strlen.c ft_memset.c
 
-compile:
-	gcc -L./libs -g ${SRCS} ${LIBS_FLAG} -o pipex
+OBJS = $(SRCS:.c=.o)
 
-run: compilef
-	./${EXEC} "file1.txt" "cat" "wc -l" "file2.txt" 
+all: $(NAME)
 
-test: compile
-	./pipex "file1.txt" "ls -l" "wc -l" "file2.txt"
+%.o:%.c
+	$(CC) $(FLAGS) -c $< -o $@
 
-clean :
-	rm pipex
-fclean :
+$(NAME): $(OBJS)
+	$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
-re : clean
-	all
+clean:
+	rm -rf $(OBJS)
 
+fclean: clean
+	rm -rf $(NAME)
 
+re: fclean all
+
+.PHONY: clean fclean all re

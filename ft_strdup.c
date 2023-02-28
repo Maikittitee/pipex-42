@@ -1,46 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_free_utils.c                                 :+:      :+:    :+:   */
+/*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/27 11:18:55 by ktunchar          #+#    #+#             */
-/*   Updated: 2023/02/28 14:25:37 by ktunchar         ###   ########.fr       */
+/*   Created: 2022/09/02 17:27:19 by ktunchar          #+#    #+#             */
+/*   Updated: 2023/02/28 14:51:42 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*ft_strjoin_free(char *s1, char *s2)
+char	*ft_strdup(const char *s1)
 {
 	char	*buffer;
-
-	buffer = ft_strjoin(s1, s2);
-	if (s1)
-		free(s1);
-	return (buffer);
-}
-
-void	ft_double_free(char **s)
-{
-	int	i;
+	int		i;
 
 	i = 0;
-	while (s[i])
+	buffer = malloc(sizeof(char) * ft_strlen(s1) + 1);
+	if (!buffer)
+		return (NULL);
+	while (s1[i])
 	{
-		free(s[i]);
+		buffer[i] = s1[i];
 		i++;
 	}
-	free(s);
-}
-
-void	ft_free_pipex(t_pipex *pipex)
-{
-	if (pipex->cmd1)
-		ft_double_free(pipex->cmd1);
-	if (pipex->cmd2)
-		ft_double_free(pipex->cmd2);
-	if (pipex->path)
-		ft_double_free(pipex->path);
+	buffer[i] = '\0';
+	return (buffer);
 }

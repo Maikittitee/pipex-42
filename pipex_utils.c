@@ -6,7 +6,7 @@
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 19:13:56 by ktunchar          #+#    #+#             */
-/*   Updated: 2023/02/27 13:59:52 by ktunchar         ###   ########.fr       */
+/*   Updated: 2023/02/28 14:23:24 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,9 @@ int	is_access_cmd(char **path, char **cmd, char *pure_cmd)
 	int	i;
 	int	access_flag;
 
+
+	if (!cmd)
+		return (0);
 	i = 0;
 	access_flag = 0;
 	temp = cmd[0];
@@ -65,56 +68,42 @@ int	is_access_cmd(char **path, char **cmd, char *pure_cmd)
 
 void	ft_find_cmd(t_pipex *pipex, char **av)
 {
-	//int	i;
 	char	*pure_cmd[2];
-	//char	*temp;
 	
-	//temp = NULL;
 	pipex->access_flag1 = 0;
 	pipex->access_flag2 = 0;
-	//i = 0;
-	pipex->cmd1 = ft_split(av[2],' ');
-	pipex->cmd2 = ft_split(av[3],' ');
-	pure_cmd[0] = ft_strdup((pipex->cmd1)[0]);
-	pure_cmd[1] = ft_strdup((pipex->cmd2)[0]);
-	//temp = (pipex->cmd1)[0];
-	if (access((pipex->cmd1)[0], F_OK) == 0)
+	pure_cmd[0] = NULL;
+	pure_cmd[1] = NULL;
+	if (av[2][0] != 0)
+	{
+		pipex->cmd1 = ft_split(av[2],' ');
+		pure_cmd[0] = ft_strdup((pipex->cmd1)[0]);
+	}
+	if (av[3][0] != 0)
+	{
+		pipex->cmd2 = ft_split(av[3],' ');
+		pure_cmd[1] = ft_strdup((pipex->cmd2)[0]);
+	}
+	if (pipex->cmd1 && access((pipex->cmd1)[0], F_OK) == 0)
 		pipex->access_flag1 = 1; 
-	if (access((pipex->cmd2)[0], F_OK) == 0)
+	if (pipex->cmd2 && access((pipex->cmd2)[0], F_OK) == 0)
 		pipex->access_flag2 = 1;
-	// if Leak --> del this 4 line
 	if (!pipex->access_flag1)
 		pipex->access_flag1 = is_access_cmd(pipex->path,pipex->cmd1, pure_cmd[0]);
 	if (!pipex->access_flag2)
 		pipex->access_flag2 = is_access_cmd(pipex->path,pipex->cmd2, pure_cmd[1]);
 		
-	// and uncomment this
-	// while (!pipex->access_flag1 && (pipex->path)[i])
-	// {
-	// 	(pipex->cmd1)[0] = ft_strjoin((pipex->path)[i],pure_cmd[0]);
-	// 	if (temp)
-	// 		free(temp);
-	// 	temp = (pipex->cmd1)[0];
-	// 	if (access((pipex->cmd1)[0], F_OK) == 0) 
-	// 		pipex->access_flag1 = 1; 
-	// 	i++;
-	// }
-	// i = 0;
-	// temp = (pipex->cmd2)[0];
-	// while (!pipex->access_flag2 && (pipex->path)[i])
-	// {
-	// 	(pipex->cmd2)[0] = ft_strjoin((pipex->path)[i], pure_cmd[1]);
-	// 	if (temp)
-	// 		free(temp);
-	// 	temp = (pipex->cmd2)[0];
-	// 	if (access((pipex->cmd2)[0], F_OK) == 0) 
-	// 		pipex->access_flag2 = 1; 
-	// 	i++;
-	// }
 	if (pure_cmd[0])
 		free(pure_cmd[0]);
 	if (pure_cmd[1])
 		free(pure_cmd[1]);
+}
 
-
+void	init_pipex(t_pipex *pipex, char **env)
+{
+	pipex->access_flag1 = 0;
+	pipex->access_flag2 = 0;
+	pipex->cmd1 = NULL;
+	pipex->cmd2 = NULL;
+	pipex->path = get_path(env);
 }

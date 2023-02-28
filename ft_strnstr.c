@@ -1,46 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_free_utils.c                                 :+:      :+:    :+:   */
+/*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/27 11:18:55 by ktunchar          #+#    #+#             */
-/*   Updated: 2023/02/28 14:25:37 by ktunchar         ###   ########.fr       */
+/*   Created: 2022/09/02 18:39:33 by ktunchar          #+#    #+#             */
+/*   Updated: 2023/02/28 14:52:16 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*ft_strjoin_free(char *s1, char *s2)
+char	*ft_strnstr(const char *haystack, const char *needle, size_t len)
 {
-	char	*buffer;
-
-	buffer = ft_strjoin(s1, s2);
-	if (s1)
-		free(s1);
-	return (buffer);
-}
-
-void	ft_double_free(char **s)
-{
-	int	i;
+	size_t	i;
+	size_t	j;
+	char	*str;
 
 	i = 0;
-	while (s[i])
+	j = 0;
+	if (len < 0)
+		return (0);
+	if (!(needle[i]))
+		return ((char *)haystack);
+	str = (char *)haystack;
+	while (str[i] && i <= len)
 	{
-		free(s[i]);
+		while (str[i + j] == needle[j] && str[i + j] && i + j < len)
+			j++;
+		if (!needle[j])
+			return (str + i);
 		i++;
+		j = 0;
 	}
-	free(s);
-}
-
-void	ft_free_pipex(t_pipex *pipex)
-{
-	if (pipex->cmd1)
-		ft_double_free(pipex->cmd1);
-	if (pipex->cmd2)
-		ft_double_free(pipex->cmd2);
-	if (pipex->path)
-		ft_double_free(pipex->path);
+	return (0);
 }

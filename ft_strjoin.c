@@ -1,46 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex_free_utils.c                                 :+:      :+:    :+:   */
+/*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktunchar <ktunchar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/27 11:18:55 by ktunchar          #+#    #+#             */
-/*   Updated: 2023/02/28 14:25:37 by ktunchar         ###   ########.fr       */
+/*   Created: 2022/09/07 20:00:50 by ktunchar          #+#    #+#             */
+/*   Updated: 2023/02/28 14:52:09 by ktunchar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*ft_strjoin_free(char *s1, char *s2)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*buffer;
+	int		i;
+	int		j;
 
-	buffer = ft_strjoin(s1, s2);
-	if (s1)
-		free(s1);
+	if (!s1 || !s2)
+		return (NULL);
+	buffer = malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof (char));
+	if (!buffer)
+		return (NULL);
+	ft_bzero(buffer, ft_strlen(s1) + ft_strlen(s2) + 1);
+	i = 0;
+	j = 0;
+	while (s1[j])
+		buffer[i++] = s1[j++];
+	j = 0;
+	while (s2[j])
+		buffer[i++] = s2[j++];
 	return (buffer);
 }
-
-void	ft_double_free(char **s)
+/*
+int	main(void)
 {
-	int	i;
-
-	i = 0;
-	while (s[i])
-	{
-		free(s[i]);
-		i++;
-	}
-	free(s);
+	printf ("%s",ft_strjoin("Hello","World"));
 }
-
-void	ft_free_pipex(t_pipex *pipex)
-{
-	if (pipex->cmd1)
-		ft_double_free(pipex->cmd1);
-	if (pipex->cmd2)
-		ft_double_free(pipex->cmd2);
-	if (pipex->path)
-		ft_double_free(pipex->path);
-}
+*/
